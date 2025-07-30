@@ -22,7 +22,7 @@ const Register = () => {
                 <AuthFormInput label="Name" type="text" name="name" value={form.name} onChange={handleChange} />
                 <AuthFormInput label="Email" type="email" name="email" value={form.email} onChange={handleChange} />
                 <AuthFormInput label="Password" type="password" name="password" value={form.password} onChange={handleChange} />
-                <button type="submit" className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition">Register</button>
+                <button type="submit" className="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded opacity-50 cursor-not-allowed" disabled>Register</button>
                 <p className="mt-4 text-sm text-center">Already have an account? <Link to="/login" className="text-green-600 hover:underline">Login</Link></p>
             </form>
         </div>
