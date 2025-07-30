@@ -20,4 +20,27 @@ const getTasksByAgent = async (req, res) => {
     }
 };
 
-module.exports = getTasksByAgent;
+
+
+const getMyTasks = async (req, res) => {
+    console.log('Hello')
+    res.json({
+        count: 12,
+        tasks:{name:'Pari'}
+    })
+    // try {
+    //     const agentId = req.user._id;
+
+    //     const tasks = await Task.find({ agent: agentId });
+
+    //     res.json({
+    //         count: tasks.length,
+    //         tasks
+    //     });
+    // } catch (error) {
+    //     res.status(500).json({ message: 'Server error', error });
+    // }
+};
+
+
+module.exports = { getTasksByAgent, getMyTasks };

@@ -20,7 +20,6 @@ const Login = () => {
         e.preventDefault();
         try {
             const res = await axiosInstance.post('/auth/login', form);
-            console.log(res.data)
             const { token, user } = res.data;
             localStorage.setItem('token', token);
             dispatch(login({ token, user }))

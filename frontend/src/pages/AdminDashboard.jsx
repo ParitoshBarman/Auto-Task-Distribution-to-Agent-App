@@ -52,7 +52,6 @@ const AdminDashboard = () => {
         setLoadingTasks(true);
         try {
             const res = await axiosInstance.get(`/tasks/${agentId}`);
-            console.log(res.data)
             setTasks(res.data || []);
         } catch (error) {
             console.error("Error fetching tasks:", error);
@@ -124,7 +123,7 @@ const AdminDashboard = () => {
                             <h3 className="text-xl font-semibold mb-4">📤 Upload File</h3>
                             <input
                                 type="file"
-                                className="w-full mb-4 border border-gray-300 p-2 rounded" onChange={(e) => { handleUploadSubmit(e.target.files[0]) }}
+                                className="w-full mb-4 border border-gray-300 p-2 rounded hover:cursor-pointer hover:border-slate-700" onChange={(e) => { handleUploadSubmit(e.target.files[0]) }} accept=".csv, .xlsx, .xls" title='Only accept files .csv, .xlsx, .xls'
                             />
                             <div className="flex justify-end">
                                 <button
