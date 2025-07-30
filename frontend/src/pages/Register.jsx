@@ -11,7 +11,7 @@ const Register = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // TODO: API call to register
+        
         console.log(form);
     };
 
