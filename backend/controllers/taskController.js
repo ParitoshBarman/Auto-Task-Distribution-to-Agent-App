@@ -1,4 +1,6 @@
 const Task = require('../models/Task');
+const User = require('../models/User')
+const Agent = require('../models/Agent')
 
 const getTasksByAgent = async (req, res) => {
     try {
@@ -23,23 +25,21 @@ const getTasksByAgent = async (req, res) => {
 
 
 const getMyTasks = async (req, res) => {
-    console.log('Hello')
-    res.json({
-        count: 12,
-        tasks:{name:'Pari'}
-    })
-    // try {
-    //     const agentId = req.user._id;
+    try {
+        const userId = req.user.id;
 
-    //     const tasks = await Task.find({ agent: agentId });
+        const user = await User.findById(userId)
+        const agent = await Agent.findOne({ email: user.email })
 
-    //     res.json({
-    //         count: tasks.length,
-    //         tasks
-    //     });
-    // } catch (error) {
-    //     res.status(500).json({ message: 'Server error', error });
-    // }
+        const tasks = await Task.find({ agent: agent._id });
+
+        res.json({
+            count: tasks.length,
+            tasks
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error });
+    }
 };
 
 

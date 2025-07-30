@@ -5,7 +5,7 @@ const { protect, authorizeRoles } = require('../middleware/authMiddleware');
 const router = express.Router();
 
 
+router.get('/my', protect, authorizeRoles('agent'), getMyTasks);
 router.get('/:agentId', protect, authorizeRoles('admin'), getTasksByAgent);
-router.get('/my', getMyTasks);
 
 module.exports = router;
