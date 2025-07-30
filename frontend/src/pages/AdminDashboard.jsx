@@ -9,6 +9,7 @@ const AdminDashboard = () => {
     const [agentData, setAgentData] = useState({
         name: "",
         email: "",
+        countryCode: "+91", // Default
         password: "",
         role: "agent"
     });
@@ -65,6 +66,7 @@ const AdminDashboard = () => {
 
     const handleCreateAgent = async (e) => {
         e.preventDefault();
+        const fullMobile = `${agentData.countryCode}${agentData.mobile}`;
 
         try {
             const res = await axiosInstance.post("/agents/create", agentData);
@@ -72,7 +74,7 @@ const AdminDashboard = () => {
             alert("Agent created successfully");
             setShowCreate(false);
             // Optionally reset form:
-            setAgentData({ name: "", email: "", mobile: "", password: "", role: "agent" });
+            setAgentData({ name: "", email: "", mobile: fullMobile, password: "", role: "agent" });
             setRefetchAgents(refetchAgents + 1);
         } catch (error) {
             console.error("Create Agent Error:", error);
@@ -84,7 +86,6 @@ const AdminDashboard = () => {
 
     const handleUploadSubmit = async (selectedFile) => {
         if (!selectedFile) return alert("Please select a file");
-        console.log(selectedFile)
 
         const formData = new FormData();
         formData.append("file", selectedFile);
@@ -125,6 +126,7 @@ const AdminDashboard = () => {
                                 type="file"
                                 className="w-full mb-4 border border-gray-300 p-2 rounded hover:cursor-pointer hover:border-slate-700" onChange={(e) => { handleUploadSubmit(e.target.files[0]) }} accept=".csv, .xlsx, .xls" title='Only accept files .csv, .xlsx, .xls'
                             />
+                            <p>Select a file will automaticaly upload</p>
                             <div className="flex justify-end">
                                 <button
                                     onClick={() => setShowUpload(false)}
@@ -160,12 +162,36 @@ const AdminDashboard = () => {
                                     name='email'
                                     className="w-full border border-gray-300 p-2 rounded mb-3" value={agentData.email} onChange={(e) => setAgentData({ ...agentData, email: e.target.value })}
                                 />
-                                <input
+                                {/* <input
                                     type="text"
                                     placeholder="Mobile Number"
                                     name='mobile'
                                     className="w-full border border-gray-300 p-2 rounded mb-3" value={agentData.mobile} onChange={(e) => setAgentData({ ...agentData, mobile: e.target.value })}
-                                />
+                                /> */}
+                                <div className="flex mb-3 space-x-2">
+                                    <select
+                                        name="countryCode"
+                                        value={agentData.countryCode}
+                                        onChange={(e) => setAgentData({ ...agentData, countryCode: e.target.value })}
+                                        className="border border-gray-300 p-2 rounded w-1/3"
+                                    >
+                                        <option value="+91">🇮🇳 +91</option>
+                                        <option value="+1">🇺🇸 +1</option>
+                                        <option value="+44">🇬🇧 +44</option>
+                                        <option value="+61">🇦🇺 +61</option>
+                                        <option value="+81">🇯🇵 +81</option>
+                                    </select>
+
+                                    <input
+                                        type="text"
+                                        placeholder="Mobile Number"
+                                        name="mobile"
+                                        className="w-2/3 border border-gray-300 p-2 rounded"
+                                        value={agentData.mobile}
+                                        onChange={(e) => setAgentData({ ...agentData, mobile: e.target.value })}
+                                    />
+                                </div>
+
                                 <input
                                     type="password"
                                     placeholder="Password"
@@ -259,7 +285,7 @@ const AdminDashboard = () => {
 
 
                 {taskModalOpen && (
-                    <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50" style={{backgroundColor:"#00000096"}}>
+                    <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50" style={{ backgroundColor: "#00000096" }}>
                         <div className="bg-white rounded-xl p-6 w-[90%] max-w-4xl shadow-2xl relative max-h-[90vh]">
                             <h2 className="text-2xl font-bold mb-4 text-gray-800">Assigned Tasks</h2>
 
