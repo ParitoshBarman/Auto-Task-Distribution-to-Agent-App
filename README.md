@@ -3,13 +3,23 @@
 Live App: [auto-task-distribution-to-agent-app.netlify.app](https://auto-task-distribution-to-agent-app.netlify.app/)  
 GitHub Repository: [github.com/ParitoshBarman/Auto-Task-Distribution-to-Agent-App](https://github.com/ParitoshBarman/Auto-Task-Distribution-to-Agent-App)
 
+
+## 🎥 Demo Video
+
+Watch the full working demo of the project here:  
+🔗 [Click to watch on Google Drive](https://drive.google.com/file/d/111STFrt97-xM-OrGTv1sKv-R8lWl0tQg/view?usp=drivesdk)
+
+
 ---
 ### Test Credentials
 
-To log in as an admin, use the following credentials:
-
+#### 🔑 Admin Login
 - **Email/Username**: `newadmin@example.com`
 - **Password**: `admin123`
+
+#### 🧑‍💼 Agent Login
+- **Email/Username**: `pariagent@example.com`
+- **Password**: `123`
 
 ---
 
@@ -126,14 +136,21 @@ JWT_SECRET=yourSecretKey
 - `GET /api/tasks/:agentId` – Get tasks by agent (Admin only)
 
 ---
-
 ## 📸 Screenshots
 
-- Login Screen
-- Admin Dashboard
-- Create Agent Modal
-- Upload File Modal
-- View Tasks Modal
+| Screenshot Name                          | Preview                                                                 |
+|------------------------------------------|-------------------------------------------------------------------------|
+| Admin Dashboard                          | ![Admin Dashboard](./screenshots/admin_dashboard.JPG)                   |
+| Agent Create Modal Form                  | ![Agent Create Modal Form](./screenshots/Agent%20create%20modal%20form.JPG) |
+| Agent Dashboard                          | ![Agent Dashboard](./screenshots/agent%20dashboard.JPG)                 |
+| Agent Mobile View                        | ![Agent Mobile View](./screenshots/agent%20mobile%20view.JPG)          |
+| File and Agent Creation Button           | ![File and Agent Creation Button](./screenshots/file%20and%20agent%20creation%20button.JPG) |
+| File Upload                              | ![File Upload](./screenshots/file%20upload.JPG)                         |
+| List of Tasks Assigned to the Agent      | ![List of Tasks](./screenshots/list%20of%20task%20that%20assigned%20to%20the%20agent.JPG) |
+| Responsive Navbar (Closed)               | ![Responsive Navbar Closed](./screenshots/responsive%20navbar%20closed.JPG) |
+| Responsive Navbar (Expanded)             | ![Responsive Navbar Expanded](./screenshots/responsive%20navbar%20expand.JPG) |
+| View Tasks Button                        | ![View Tasks Button](./screenshots/View%20tasks%20button.JPG)           |
+
 
 ---
 
