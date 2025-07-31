@@ -13,7 +13,7 @@ connectDB();
 
 const app = express();
 app.use(cors({
-    origin: 'https://auto-task-distribution-to-agent-app.netlify.app',
+    origin: '*',
     methods: ['GET', 'POST'],
     credentials: true
 }));
