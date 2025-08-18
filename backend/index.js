@@ -12,7 +12,24 @@ dotenv.config();
 connectDB();
 
 const app = express();
-app.use(cors());
+// app.use(cors());
+const allowedOrigins = [
+    "http://localhost:5000",
+    "https://auto-task-distribution-to-agent-app.netlify.app"
+];
+
+app.use(cors({
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error("Not allowed by CORS"));
+        }
+    },
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true
+}));
+
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);
