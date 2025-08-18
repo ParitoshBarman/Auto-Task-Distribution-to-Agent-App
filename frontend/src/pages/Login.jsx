@@ -6,6 +6,8 @@ import { login } from '../redux/authSlice';
 // import { setUser } from '../redux/userSlice';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import toast, { Toaster } from 'react-hot-toast';
+
 
 const Login = () => {
     const navigate = useNavigate();
@@ -24,6 +26,7 @@ const Login = () => {
             localStorage.setItem('token', token);
             dispatch(login({ token, user }))
             // dispatch(setUser(token, user.role, user.name, user.email))
+            toast.success("Successfully Login")
             navigate('/dashboard')
         } catch (error) {
             console.error('Failed to login', error);
@@ -33,6 +36,7 @@ const Login = () => {
 
     return (
         <div className="flex justify-center items-center min-h-screen bg-gray-100">
+            <Toaster />
             <form onSubmit={handleSubmit} className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
                 <h2 className="text-2xl font-semibold text-center mb-6">Login</h2>
                 <AuthFormInput label="Email" type="email" name="email" value={form.email} onChange={handleChange} />

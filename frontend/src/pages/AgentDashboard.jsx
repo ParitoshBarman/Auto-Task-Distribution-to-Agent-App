@@ -205,6 +205,18 @@ const AgentDashboard = () => {
     };
 
 
+    // Delete agent
+    const handleDeleteAgent = async (id) => {
+        if (!window.confirm("Are you sure you want to delete this agent?")) return;
+        try {
+            await axiosInstance.delete(`/agents/${id}`);
+            toast.success("Agent deleted successfully 🗑️");
+            setRefetchAgents(refetchAgents + 1);
+        } catch (error) {
+            toast.error("Failed to delete agent");
+        }
+    };
+
 
 
     // for cart section
