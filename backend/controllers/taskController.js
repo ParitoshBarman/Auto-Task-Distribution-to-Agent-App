@@ -43,4 +43,44 @@ const getMyTasks = async (req, res) => {
 };
 
 
-module.exports = { getTasksByAgent, getMyTasks };
+
+// ✅ Update a Task
+const updateTask = async (req, res) => {
+    try {
+        const taskId = req.params.taskId;
+        const updatedData = req.body; // pass { title, description, status, etc. }
+
+        const task = await Task.findByIdAndUpdate(taskId, updatedData, { new: true });
+
+        if (!task) {
+            return res.status(404).json({ message: 'Task not found' });
+        }
+
+        res.json({
+            message: 'Task updated successfully',
+            task
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error });
+    }
+};
+
+// ✅ Delete a Task
+const deleteTask = async (req, res) => {
+    try {
+        const taskId = req.params.taskId;
+
+        const task = await Task.findByIdAndDelete(taskId);
+
+        if (!task) {
+            return res.status(404).json({ message: 'Task not found' });
+        }
+
+        res.json({ message: 'Task deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error });
+    }
+};
+
+
+module.exports = { getTasksByAgent, getMyTasks, updateTask, deleteTask };

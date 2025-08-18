@@ -9,7 +9,13 @@ exports.uploadCSV = async (req, res) => {
 
     if (!file) return res.status(400).json({ message: 'No file uploaded' });
 
-    const agents = await Agent.find();
+    let agents;
+    if(req.user.role == "admin"){
+        agents = await Agent.find();
+    }
+    else{
+        agents = await Agent.find({ createdBy: req.user.id });
+    }
     if (agents.length < 1) return res.status(400).json({ message: 'No agents found' });
 
     const items = [];

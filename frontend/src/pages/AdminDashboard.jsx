@@ -1,52 +1,50 @@
 import React, { useEffect, useState } from 'react';
 import Navbar from '../components/Navbar';
 import axiosInstance from '../api/axiosInstance';
+import toast, { Toaster } from 'react-hot-toast';
 
 const AdminDashboard = () => {
-    // for form handle
     const [showUpload, setShowUpload] = useState(false);
     const [showCreate, setShowCreate] = useState(false);
+    const [showEdit, setShowEdit] = useState(false);
+
     const [agentData, setAgentData] = useState({
         name: "",
         email: "",
-        countryCode: "+91", // Default
+        countryCode: "+91",
+        mobile: "",
         password: "",
         role: "agent"
     });
 
+    const [editAgent, setEditAgent] = useState(null);
 
-
-
-    // for view all agents 
     const [agents, setAgents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [refetchAgents, setRefetchAgents] = useState(0);
 
-
-    // for all tasks view for perticular agent
     const [selectedAgentId, setSelectedAgentId] = useState(null);
     const [taskModalOpen, setTaskModalOpen] = useState(false);
     const [tasks, setTasks] = useState([]);
     const [loadingTasks, setLoadingTasks] = useState(false);
 
-
+    // Fetch agents
     const fetchAgents = async () => {
         try {
             const response = await axiosInstance.get('/agents');
             setAgents(response.data || []);
         } catch (error) {
-            console.error('Failed to fetch agents:', error);
+            toast.error("Failed to fetch agents");
         } finally {
             setLoading(false);
         }
     };
 
-
     useEffect(() => {
         fetchAgents();
-    }, [refetchAgents])
+    }, [refetchAgents]);
 
-
+    // View tasks
     const handleViewTasks = async (agentId) => {
         setSelectedAgentId(agentId);
         setTaskModalOpen(true);
@@ -55,33 +53,86 @@ const AdminDashboard = () => {
             const res = await axiosInstance.get(`/tasks/${agentId}`);
             setTasks(res.data || []);
         } catch (error) {
-            console.error("Error fetching tasks:", error);
+            toast.error("Error fetching tasks");
             setTasks([]);
         } finally {
             setLoadingTasks(false);
         }
     };
 
-
-
+    // Create agent
     const handleCreateAgent = async (e) => {
         e.preventDefault();
-        const fullMobile = `${agentData.countryCode}${agentData.mobile}`;
-
         try {
-            const res = await axiosInstance.post("/agents/create", agentData);
-            // console.log("Agent Created:", res.data);
-            alert("Agent created successfully");
+            await axiosInstance.post("/agents/create", agentData);
+            toast.success("Agent created successfully ✅");
             setShowCreate(false);
-            // Optionally reset form:
-            setAgentData({ name: "", email: "", mobile: fullMobile, password: "", role: "agent" });
+            setAgentData({ name: "", email: "", countryCode: "+91", mobile: "", password: "", role: "agent" });
             setRefetchAgents(refetchAgents + 1);
         } catch (error) {
-            console.error("Create Agent Error:", error);
-            console.log("Error:", error.response.data);
-            alert("Failed to create agent");
+            toast.error(error.response?.data?.message || "Failed to create agent");
         }
     };
+
+    // Delete agent
+    const handleDeleteAgent = async (id) => {
+        if (!window.confirm("Are you sure you want to delete this agent?")) return;
+        try {
+            await axiosInstance.delete(`/agents/${id}`);
+            toast.success("Agent deleted successfully 🗑️");
+            setRefetchAgents(refetchAgents + 1);
+        } catch (error) {
+            toast.error("Failed to delete agent");
+        }
+    };
+
+    // Edit agent
+    const handleEditAgent = (agent) => {
+        setEditAgent(agent);
+        setShowEdit(true);
+    };
+
+    const handleUpdateAgent = async (e) => {
+        e.preventDefault();
+        try {
+            await axiosInstance.put(`/agents/${editAgent._id}`, editAgent);
+            toast.success("Agent updated successfully ✏️");
+            setShowEdit(false);
+            setEditAgent(null);
+            setRefetchAgents(refetchAgents + 1);
+        } catch (error) {
+            toast.error("Failed to update agent");
+        }
+    };
+
+
+    const [editingTask, setEditingTask] = useState(null);
+
+    const handleEditTask = async (taskId, updatedTask) => {
+        try {
+            await axiosInstance.put(`/tasks/${taskId}`, updatedTask);
+            toast.success("Task updated successfully"); // if using react-hot-toast
+            setEditingTask(null);
+            handleViewTasks(selectedAgentId); // refresh tasks
+        } catch (error) {
+            console.error("Edit Task Error:", error);
+            toast.error("Failed to update task");
+        }
+    };
+
+
+    // Delete task
+    const handleDeleteTask = async (taskId) => {
+        if (!window.confirm("Are you sure you want to delete this task?")) return;
+        try {
+            await axiosInstance.delete(`/tasks/${taskId}`);
+            toast.success("Task deleted successfully 🗑️");
+            handleViewTasks(selectedAgentId);
+        } catch (error) {
+            toast.error("Failed to delete task");
+        }
+    };
+
 
 
     const handleUploadSubmit = async (selectedFile) => {
@@ -97,12 +148,12 @@ const AdminDashboard = () => {
                 },
             });
             // console.log("Upload Success:", res.data);
-            alert("File uploaded successfully");
+            toast.success("File uploaded successfully");
             setShowUpload(false);
         } catch (error) {
             console.error("Upload Error:", error);
             console.log('Error:', error.response.data)
-            alert("Upload failed");
+            toast.error("Upload failed");
         }
     };
 
@@ -110,6 +161,8 @@ const AdminDashboard = () => {
     return (
         <>
             <Navbar />
+            <Toaster position="top-center" reverseOrder={false} />
+
             <div className="p-6">
                 <h2 className="text-xl font-bold mb-4">Admin Dashboard</h2>
 
@@ -139,6 +192,7 @@ const AdminDashboard = () => {
                     </div>
                 )}
 
+                {/* --- CREATE AGENT MODAL --- */}
                 {showCreate && (
                     <div className="fixed inset-0 flex items-center justify-center bg-black z-50" style={{ backgroundColor: '#0000008c' }}>
                         <div className="bg-white p-6 rounded-xl shadow-2xl w-[90%] max-w-md relative">
@@ -217,129 +271,177 @@ const AdminDashboard = () => {
                     </div>
                 )}
 
+                {/* --- EDIT AGENT MODAL --- */}
+                {showEdit && editAgent && (
+                    <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50">
+                        <div className="bg-white p-6 rounded-xl shadow-xl w-[90%] max-w-md">
+                            <h3 className="text-lg font-bold mb-3">✏️ Edit Agent</h3>
+                            <form onSubmit={handleUpdateAgent}>
+                                <input type="text" className="w-full border p-2 mb-3 rounded"
+                                    value={editAgent.name} onChange={(e) => setEditAgent({ ...editAgent, name: e.target.value })} />
+                                <input type="email" className="w-full border p-2 mb-3 rounded"
+                                    value={editAgent.email} onChange={(e) => setEditAgent({ ...editAgent, email: e.target.value })} />
+                                <input type="text" className="w-full border p-2 mb-3 rounded"
+                                    value={editAgent.mobile} onChange={(e) => setEditAgent({ ...editAgent, mobile: e.target.value })} />
+
+                                <div className="flex justify-end space-x-2">
+                                    <button type="button" onClick={() => setShowEdit(false)} className="px-4 py-2 text-gray-600">Cancel</button>
+                                    <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">Update</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                )}
+
+                {/* --- AGENTS TABLE --- */}
                 <div className="mt-6">
                     <h3 className="text-lg font-semibold mb-4">All Agents</h3>
-
                     <div className="overflow-x-auto rounded shadow">
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-100">
                                 <tr>
-                                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">#</th>
-                                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Name</th>
-                                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Email</th>
-                                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Mobile</th>
-                                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Actions</th>
+                                    <th className="px-4 py-2">#</th>
+                                    <th className="px-4 py-2">Name</th>
+                                    <th className="px-4 py-2">Email</th>
+                                    <th className="px-4 py-2">Mobile</th>
+                                    <th className="px-4 py-2">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-200">
+                            <tbody>
                                 {loading ? (
-                                    // Skeleton Rows
-                                    Array.from({ length: 5 }).map((_, i) => (
-                                        <tr key={i} className="animate-pulse">
-                                            <td className="px-4 py-3">
-                                                <div className="h-4 bg-gray-200 rounded w-6" />
-                                            </td>
-                                            <td className="px-4 py-3">
-                                                <div className="h-4 bg-gray-200 rounded w-32" />
-                                            </td>
-                                            <td className="px-4 py-3">
-                                                <div className="h-4 bg-gray-200 rounded w-40" />
-                                            </td>
-                                            <td className="px-4 py-3">
-                                                <div className="h-4 bg-gray-200 rounded w-24" />
-                                            </td>
-                                            <td className="px-4 py-3">
-                                                <div className="h-4 bg-gray-200 rounded w-24" />
-                                            </td>
-                                        </tr>
-                                    ))
+                                    <tr><td colSpan="5" className="text-center py-4">Loading...</td></tr>
                                 ) : agents.length > 0 ? (
                                     agents.map((agent, index) => (
-                                        <tr key={agent._id} className="hover:bg-gray-50">
-                                            <td className="px-4 py-3 text-sm text-gray-700">{index + 1}</td>
-                                            <td className="px-4 py-3 text-sm text-gray-700">{agent.name}</td>
-                                            <td className="px-4 py-3 text-sm text-gray-700">{agent.email}</td>
-                                            <td className="px-4 py-3 text-sm text-gray-700">{agent.mobile}</td>
-                                            <td className="px-4 py-3">
-                                                <button
-                                                    onClick={() => handleViewTasks(agent._id)}
-                                                    className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded cursor-pointer"
-                                                >
-                                                    View Tasks
-                                                </button>
+                                        <tr key={agent._id}>
+                                            <td className="px-4 py-2">{index + 1}</td>
+                                            <td className="px-4 py-2">{agent.name}</td>
+                                            <td className="px-4 py-2">{agent.email}</td>
+                                            <td className="px-4 py-2">{agent.mobile}</td>
+                                            <td className="px-4 py-2 flex gap-2">
+                                                <button onClick={() => handleViewTasks(agent._id)} className="bg-blue-600 text-white px-2 py-1 rounded">Tasks</button>
+                                                <button onClick={() => handleEditAgent(agent)} className="bg-yellow-500 text-white px-2 py-1 rounded">Edit</button>
+                                                <button onClick={() => handleDeleteAgent(agent._id)} className="bg-red-600 text-white px-2 py-1 rounded">Delete</button>
                                             </td>
                                         </tr>
                                     ))
                                 ) : (
-                                    <tr>
-                                        <td colSpan="4" className="px-4 py-6 text-center text-gray-500">
-                                            No agents found.
-                                        </td>
-                                    </tr>
+                                    <tr><td colSpan="5" className="text-center py-4">No agents found.</td></tr>
                                 )}
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-
-
+                {/* --- TASKS MODAL --- */}
                 {taskModalOpen && (
-                    <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50" style={{ backgroundColor: "#00000096" }}>
-                        <div className="bg-white rounded-xl p-6 w-[90%] max-w-4xl shadow-2xl relative max-h-[90vh]">
-                            <h2 className="text-2xl font-bold mb-4 text-gray-800">Assigned Tasks</h2>
-
+                    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+                        <div className="bg-white rounded-xl p-6 w-[90%] max-h-[90vh] max-w-4xl shadow-2xl relative overflow-auto">
+                            <h2 className="text-xl font-bold mb-4">Assigned Tasks</h2>
                             <button
                                 onClick={() => setTaskModalOpen(false)}
-                                className="absolute top-3 right-4 text-gray-600 hover:text-red-600 text-2xl"
-                                title="Close"
+                                className="absolute top-3 right-4 text-gray-600"
                             >
-                                &times;
+                                ✖
                             </button>
 
                             {loadingTasks ? (
-                                <div className="space-y-4">
-                                    {[1, 2, 3].map((i) => (
-                                        <div key={i} className="animate-pulse h-6 bg-gray-300 rounded w-full" />
-                                    ))}
-                                </div>
-                            ) : tasks.tasks.length === 0 ? (
-                                <div className="text-center text-gray-600 text-lg">No tasks assigned for this agent.</div>
+                                <p>Loading tasks...</p>
+                            ) : tasks.tasks?.length === 0 ? (
+                                <p>No tasks assigned.</p>
                             ) : (
-                                <>
-                                    <div className="mb-4 text-gray-700 text-sm">
-                                        Total Tasks Assigned: <span className="font-semibold">{tasks.count}</span>
-                                    </div>
-
-                                    {/* ✅ Scrollable content */}
-                                    <div className="overflow-y-auto max-h-[60vh] border rounded-md">
-                                        <table className="w-full text-sm text-left text-gray-800">
-                                            <thead className="bg-gray-100 sticky top-0 z-10 shadow-sm">
-                                                <tr className="text-xs text-gray-700 uppercase tracking-wide border-b">
-                                                    <th className="p-3 border-r">#</th>
-                                                    <th className="p-3 border-r">First Name</th>
-                                                    <th className="p-3 border-r">Phone</th>
-                                                    <th className="p-3">Notes</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {tasks.tasks.map((task, index) => (
-                                                    <tr
-                                                        key={task._id}
-                                                        className={`border-b hover:bg-gray-50 transition duration-150 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
-                                                            }`}
+                                <table className="w-full text-sm border">
+                                    <thead className="bg-gray-100">
+                                        <tr>
+                                            <th className="p-2">#</th>
+                                            <th className="p-2">First Name</th>
+                                            <th className="p-2">Phone</th>
+                                            <th className="p-2">Notes</th>
+                                            <th className="p-2">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {tasks.tasks.map((task, index) => (
+                                            <tr key={task._id} className="border-t">
+                                                <td className="p-2">{index + 1}</td>
+                                                <td className="p-2">{task.firstName}</td>
+                                                <td className="p-2">{task.phone}</td>
+                                                <td className="p-2">{task.notes}</td>
+                                                <td className="p-2 flex gap-2">
+                                                    <button
+                                                        onClick={() => setEditingTask(task)} // 👈 open edit modal
+                                                        className="bg-yellow-500 text-white px-2 py-1 rounded"
                                                     >
-                                                        <td className="p-3 border-r">{index + 1}</td>
-                                                        <td className="p-3 border-r">{task.firstName}</td>
-                                                        <td className="p-3 border-r">{task.phone}</td>
-                                                        <td className="p-3">{task.notes}</td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </>
+                                                        Edit
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDeleteTask(task._id)}
+                                                        className="bg-red-600 text-white px-2 py-1 rounded"
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
                             )}
+                        </div>
+                    </div>
+                )}
+
+                {/* ✅ Edit Task Modal */}
+                {editingTask && (
+                    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                        <div className="bg-white p-6 rounded-xl shadow-xl w-[90%] max-w-md">
+                            <h3 className="text-lg font-bold mb-4">Edit Task</h3>
+                            <form
+                                onSubmit={(e) => {
+                                    e.preventDefault();
+                                    handleEditTask(editingTask._id, editingTask);
+                                }}
+                            >
+                                <input
+                                    type="text"
+                                    placeholder="First Name"
+                                    value={editingTask.firstName}
+                                    onChange={(e) =>
+                                        setEditingTask({ ...editingTask, firstName: e.target.value })
+                                    }
+                                    className="w-full border p-2 rounded mb-3"
+                                />
+                                <input
+                                    type="text"
+                                    placeholder="Phone"
+                                    value={editingTask.phone}
+                                    onChange={(e) =>
+                                        setEditingTask({ ...editingTask, phone: e.target.value })
+                                    }
+                                    className="w-full border p-2 rounded mb-3"
+                                />
+                                <textarea
+                                    placeholder="Notes"
+                                    value={editingTask.notes}
+                                    onChange={(e) =>
+                                        setEditingTask({ ...editingTask, notes: e.target.value })
+                                    }
+                                    className="w-full border p-2 rounded mb-3"
+                                />
+                                <div className="flex justify-end gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => setEditingTask(null)}
+                                        className="bg-gray-400 text-white px-3 py-1 rounded"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="bg-green-600 text-white px-3 py-1 rounded"
+                                    >
+                                        Save
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 )}

@@ -5,7 +5,7 @@ const taskSchema = new mongoose.Schema({
     phone: String,
     notes: String,
     agent: { type: mongoose.Schema.Types.ObjectId, ref: 'Agent' },
-    status:{type:String, enum:['pending', 'complete'], default:'complete'}
+    status:{type:String, enum:['pending', 'complete', 'inprogress'], default:'pending'}
 });
 
 module.exports = mongoose.model('Task', taskSchema);
