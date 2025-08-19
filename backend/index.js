@@ -14,7 +14,7 @@ connectDB();
 const app = express();
 // app.use(cors());
 const allowedOrigins = [
-    "http://localhost:5000",
+    "http://localhost:5173",
     "https://auto-task-distribution-to-agent-app.netlify.app"
 ];
 
