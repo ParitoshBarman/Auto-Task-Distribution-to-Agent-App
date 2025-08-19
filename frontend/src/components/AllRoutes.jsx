@@ -23,6 +23,7 @@ const AllRoutes = () => {
                     {user?.role === 'admin' ? <AdminDashboard /> : <AgentDashboard />}
                 </PrivateRoute>
             } />
+            <Route path="/*" element={user ? <h1 style={{fontSize:'100px',textAlign:'center',color:'red'}}>404 <br/> Not Found</h1>: <Login />} />
         </Routes>
     );
 };
