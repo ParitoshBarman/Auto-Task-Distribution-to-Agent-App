@@ -7,6 +7,7 @@ import UploadFile from "../pages/UploadFile"
 import AgentDashboard from "../pages/AgentDashboard";
 import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
+import Create from "../pages/Create";
 
 const AllRoutes = () => {
     const user = useSelector((state) => state.auth.user);
@@ -16,6 +17,7 @@ const AllRoutes = () => {
             <Route path="/login" element={user ? <Navigate to={'/dashboard'} /> : <Login />} />
             <Route path="/register" element={user ? <Navigate to={'/dashboard'} /> : <Register />} />
             <Route path="/upload" element={user ? <UploadFile/> : <Login />} />
+            <Route path="/create" element={user ? <Create/> : <Login />} />
             <Route path="/dashboard" element={
                 <PrivateRoute>
                     {user?.role === 'admin' ? <AdminDashboard /> : <AgentDashboard />}
