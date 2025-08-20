@@ -37,5 +37,9 @@ app.use('/api/agents', agentRoutes);
 app.use('/api/csv', csvRoutes);
 app.use('/api/tasks', taskRoutes);
 
+app.get('/', (req, res) => {
+    res.send("Welcome to Auto Task Distribution to Agent App by Paritosh Barman")
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

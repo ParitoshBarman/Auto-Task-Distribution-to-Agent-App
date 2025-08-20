@@ -4,7 +4,14 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React</title>
+    <title>Auto Task Distribution to Agent App by Paritosh Barman</title>
+
+    <script>
+    // Wake up the Render backend server early to reduce delay in first real API request (Because I am using render free service for deploying the backend)
+    fetch('https://auto-task-distribution-to-agent-app.onrender.com')
+      .then(() => console.log("Backend wake-up ping sent"))
+      .catch((err) => console.log("Backend wake-up failed:", err));
+  </script>
   </head>
   <body>
     <div id="root"></div>
