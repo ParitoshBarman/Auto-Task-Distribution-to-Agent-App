@@ -23,34 +23,49 @@ Watch the full working demo of the project here:
 
 ---
 
-## 🧠 Objective
+## 🧠 Objective  
 
-Build a MERN stack application to manage agents and automatically distribute tasks uploaded via CSV equally among them.
+Develop a powerful and scalable **MERN stack application** that streamlines agent management and automates task distribution.  
+The system ensures:  
+- **Seamless Admin & Agent Management** with secure authentication.  
+- **Automated Task Allocation** from uploaded CSV files, distributed fairly among agents.  
+- **Real-time Task Monitoring** for both admins and agents.  
+- **Scalable & Efficient Workflow**, reducing manual effort and improving productivity.  
 
 ---
-
 ## ✨ Features
 
-### 1. Admin Login
-- JWT-based authentication.
-- Login with email and password.
-- Redirect to dashboard on success.
+### 1. Secure Admin Login
+- 🔐 JWT-based authentication.
+- Login with **Email & Password**.
+- Seamless redirect to **Admin Dashboard** on success.
 
 ### 2. Agent Management
-- Admin can add agents.
-- Agent details: Name, Email, Mobile Number (with Country Code), Password.
-- View all registered agents.
+- 👤 Admin can **create and manage Agents**.
+- Agent details include: **Name, Email, Mobile (with Country Code), Password**.
+- 📋 View and manage all registered agents.
 
-### 3. Task Upload and Distribution
-- Upload CSV with fields: FirstName, Phone, Notes.
-- File validation: accepts only .csv, .xlsx, .xls.
-- Tasks distributed equally among all agents.
-- Remaining tasks assigned sequentially.
+### 3. Sub-Agent Management (by Agents)
+- 🧑‍🤝‍🧑 Agents can **create their own Sub-Agents**.
+- Sub-Agent details include: **Name, Email, Mobile Number, Password**.
+- 🔒 **Restriction:** Sub-Agents are fully managed by their parent Agent (no cross-edit or delete access).
+- Agents cannot edit/delete other Agents’ Sub-Agents.
 
-### 4. Task Viewing
-- Admin can view all tasks assigned to an agent in a modal.
-- Total task count shown.
-- Agents can also view their own tasks.
+### 4. Task Upload & Distribution
+- 📂 Upload task files in **CSV, XLSX, or XLS** formats.
+- ✅ Built-in **file validation** (only supported formats allowed).
+- 📊 Tasks are **distributed equally** among all Agents.
+- ⚡ Remaining tasks are assigned **sequentially** for fairness.
+
+### 5. Task Viewing & Monitoring
+- 👨‍💼 Admin can **view all tasks** assigned to any Agent in a modal view.
+- 📌 Shows **total task count** per Agent.
+- 👨‍👩‍👦 Agents can also view tasks assigned to them and their Sub-Agents.
+
+### 6. User-Friendly Dashboard
+- 📈 Clean and professional UI with **real-time task insights**.
+- 🔎 Quick navigation for Admin, Agents, and Sub-Agents.
+- 🚀 Optimized for smooth performance and scalability.
 
 ---
 
@@ -60,6 +75,74 @@ Build a MERN stack application to manage agents and automatically distribute tas
 - **Backend**: Node.js, Express.js
 - **Database**: MongoDB
 - **Authentication**: JWT, bcrypt
+
+---
+
+## 📂 Folder Structure
+
+```Auto-Task-Distribution-to-Agent-App
+├── README.md
+├── backend
+│   ├── config
+│   │   └── db.js
+│   ├── controllers
+│   │   ├── agentController.js
+│   │   ├── authController.js
+│   │   ├── csvController.js
+│   │   └── taskController.js
+│   ├── index.js
+│   ├── middleware
+│   │   ├── authMiddleware.js
+│   │   └── uploadMiddleware.js
+│   ├── models
+│   │   ├── Agent.js
+│   │   ├── Task.js
+│   │   └── User.js
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── routes
+│   │   ├── agentRoutes.js
+│   │   ├── authRoutes.js
+│   │   ├── csvRoutes.js
+│   │   └── taskRoutes.js
+│   └── uploads
+│       ├── 1755575720975-sample_contacts.csv
+│       └── test.txt
+├── frontend
+│   ├── README.md
+│   ├── eslint.config.js
+│   ├── index.html
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── public
+│   │   ├── _redirects
+│   │   └── vite.svg
+│   ├── src
+│   │   ├── App.css
+│   │   ├── App.jsx
+│   │   ├── api
+│   │   │   └── axiosInstance.js
+│   │   ├── assets
+│   │   │   └── react.svg
+│   │   ├── components
+│   │   │   ├── AllRoutes.jsx
+│   │   │   ├── AuthFormInput.jsx
+│   │   │   ├── Navbar.jsx
+│   │   │   └── PrivateRoute.jsx
+│   │   ├── index.css
+│   │   ├── main.jsx
+│   │   ├── pages
+│   │   │   ├── AdminDashboard.jsx
+│   │   │   ├── AgentDashboard.jsx
+│   │   │   ├── Create.jsx
+│   │   │   ├── Login.jsx
+│   │   │   ├── Register.jsx
+│   │   │   └── UploadFile.jsx
+│   │   └── redux
+│   │       ├── authSlice.js
+│   │       ├── store.js
+│   │       └── userSlice.js
+│   └── vite.config.js
 
 ---
 
@@ -119,21 +202,43 @@ JWT_SECRET=yourSecretKey
 
 ## 🚀 Routes Overview
 
-### Auth Routes
-- `POST /api/auth/login` – Login
-- `POST /api/auth/register` – Register
+### 🔹 Frontend Routes (React Router)
+- `/` → Redirects to **/dashboard** if logged in, otherwise **Login**
+- `/login` → User Login page
+- `/register` → User Registration page
+- `/upload` → Upload CSV file (protected: Admin/Agent only)
+- `/create` → Create Agent / Sub-Agent (protected)
+- `/dashboard` → 
+  - **Admin** → AdminDashboard  
+  - **Agent** → AgentDashboard  
+- `/*` → Custom 404 Page (for invalid routes)
 
-### Agent Routes
-- `POST /api/agents/create` – Add agent (Admin only)
-- `GET /api/agents` – View all agents
+---
 
-### CSV Routes
-- `POST /api/csv/upload` – Upload task file (Admin only)
-- `GET /api/csv/agent/:id` – Get tasks for specific agent
+### 🔹 Backend API Routes (Express.js)
 
-### Task Routes
-- `GET /api/tasks/my` – Get my tasks (Agent only)
-- `GET /api/tasks/:agentId` – Get tasks by agent (Admin only)
+#### Auth Routes (`/api/auth`)
+- `POST /login` → Login user
+- `POST /register` → Register new user
+
+#### Agent Routes (`/api/agents`)
+- `POST /create` → Create new Agent or Sub-Agent (Admin/Agent only)
+- `GET /` → Get all Agents (Admin) or own sub-agents (Agent)
+- `PUT /:id` → Update Agent details
+- `DELETE /:id` → Delete Agent
+
+#### CSV Routes (`/api/csv`)
+- `POST /upload` → Upload CSV file (Admin/Agent only)
+- `GET /agent/:id` → Get tasks assigned to specific agent
+
+#### Task Routes (`/api/tasks`)
+- `GET /my` → Get tasks for logged-in user (Admin/Agent)
+- `GET /:agentId` → Get tasks assigned to a specific agent
+- `PUT /:taskId` → Update a task
+- `DELETE /:taskId` → Delete a task
+
+#### Root Route
+- `GET /` → Welcome message: *"Welcome to Auto Task Distribution to Agent App by Paritosh Barman"*
 
 ---
 ## 📸 Screenshots
@@ -143,6 +248,7 @@ JWT_SECRET=yourSecretKey
 | Admin Dashboard                          | ![Admin Dashboard](./screenshots/admin_dashboard.JPG)                   |
 | Agent Create Modal Form                  | ![Agent Create Modal Form](./screenshots/Agent%20create%20modal%20form.JPG) |
 | Agent Dashboard                          | ![Agent Dashboard](./screenshots/agent%20dashboard.JPG)                 |
+| Create Sub-Agent by Agent | ![Create Sub-Agent by Agent](./screenshots/create%20subagent%20by%20agent.JPG) |
 | Agent Mobile View                        | ![Agent Mobile View](./screenshots/agent%20mobile%20view.JPG)          |
 | File and Agent Creation Button           | ![File and Agent Creation Button](./screenshots/file%20and%20agent%20creation%20button.JPG) |
 | File Upload                              | ![File Upload](./screenshots/file%20upload.JPG)                         |
