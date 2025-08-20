@@ -144,6 +144,7 @@ The system ensures:
 │   │       └── userSlice.js
 │   └── vite.config.js
 
+```
 ---
 
 ## 🧪 How to Run Locally
